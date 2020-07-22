@@ -1,5 +1,9 @@
 package com.mashibing.mashibing.system.io.testNetty03;
 
+import static jdk.nashorn.internal.objects.NativeFunction.bind;
+
+import io.netty.bootstrap.Bootstrap;
+import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.buffer.Unpooled;
@@ -8,13 +12,18 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.ServerSocketChannel;
+import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.charset.Charset;
+import java.util.Iterator;
+import java.util.Map.Entry;
 import org.junit.Test;
 
 /**
@@ -116,6 +125,30 @@ public class MyNetty {
     closeFuture.sync();
   }
 
+  @Test
+  public void clientTest2() throws Exception {
+
+    NioEventLoopGroup group = new NioEventLoopGroup(1);
+    Bootstrap bs = new Bootstrap();
+    ChannelFuture connect = bs.group(group)
+        .channel(NioSocketChannel.class)
+//        .handler(new MyInHandler())
+        .handler(new ChannelInitializer<SocketChannel>() {
+
+          @Override
+          protected void initChannel(SocketChannel socketChannel) throws Exception {
+            ChannelPipeline pipeline = socketChannel.pipeline();
+            pipeline.addLast(new MyInHandler());
+          }
+        })
+        .connect("192.168.68.129", 9090);
+    Channel channel = connect.sync().channel();
+    ByteBuf byteBuf = Unpooled.copiedBuffer("hello server".getBytes());
+    ChannelFuture send = channel.writeAndFlush(byteBuf);
+    send.sync();
+    channel.closeFuture().sync();
+  }
+
   /**
    * 服务端 NioServerSocketChannel
    */
@@ -131,6 +164,24 @@ public class MyNetty {
     bind.sync();//绑定阻塞
     ChannelFuture closeFuture = serverSocketChannel.closeFuture();
     closeFuture.sync();
+  }
+
+  @Test
+  public void serverTest2() throws Exception {
+    NioEventLoopGroup nioEventLoopGroup = new NioEventLoopGroup(3);
+    ServerBootstrap bs = new ServerBootstrap();
+    ChannelFuture bind = bs.group(nioEventLoopGroup, nioEventLoopGroup)
+        .channel(NioServerSocketChannel.class)
+        .childHandler(new ChannelInitializer<SocketChannel>() {
+          @Override
+          protected void initChannel(SocketChannel serverSocketChannel) throws Exception {
+            ChannelPipeline pipeline = serverSocketChannel.pipeline();
+            pipeline.addLast(nioEventLoopGroup, new MyInHandler());
+          }
+        })
+        .bind(new InetSocketAddress("192.168.68.1", 9090));
+    bind.sync();
+    bind.channel().closeFuture().sync();
   }
 
   class MyAcceptHandler extends ChannelInboundHandlerAdapter {
@@ -182,12 +233,15 @@ public class MyNetty {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
       //读事件
+      ChannelPipeline pipeline = ctx.pipeline();
+      Iterator<Entry<String, ChannelHandler>> iterator = pipeline.iterator();
+      while (iterator.hasNext()) {
+        System.out.println(iterator.next());
+      }
       ByteBuf byteBuf = (ByteBuf) msg;
       System.out.println(byteBuf.getCharSequence(0,byteBuf.readableBytes(), Charset.forName("utf8")));
       Channel channel = ctx.channel();
       channel.writeAndFlush(msg);
     }
-
-
   }
 }
