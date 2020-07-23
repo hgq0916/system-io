@@ -25,6 +25,7 @@ public class Server {
           @Override
           protected void initChannel(NioSocketChannel nioSocketChannel) throws Exception {
             ChannelPipeline pipeline = nioSocketChannel.pipeline();
+            pipeline.addLast(new ClientRequestDecoder());//添加客户端数据解码器
             pipeline.addLast(new ClientRequestHandler());
           }
         })

@@ -23,12 +23,8 @@ public class ClientRequestHandler extends ChannelInboundHandlerAdapter {
 
   @Override
   public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-    ByteBuf buf = (ByteBuf) msg;
-    byte[] data = new byte[buf.readableBytes()];
-    buf.readBytes(data);
 
-    //对客户端的请求解码
-    RequestBean requestBean = RequestBean.deserialize(data);
+    RequestBean requestBean = (RequestBean) msg;
 
     System.out.println("收到请求："+requestBean);
 
