@@ -10,6 +10,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import java.io.IOException;
 import java.lang.reflect.Method;
 
 /**
@@ -30,14 +31,22 @@ public class ClientRequestHandler extends ChannelInboundHandlerAdapter {
     RequestBean requestBean = RequestBean.deserialize(data);
 
     System.out.println("收到请求："+requestBean);
-    //处理请求
-    ResponseBean responseBean = handleRequest(requestBean);
-    byte[] responseData = responseBean.serialize();
 
-    NioSocketChannel channel = (NioSocketChannel) ctx.channel();
-    ByteBuf byteBuf = ByteBufAllocator.DEFAULT.directBuffer();
-    byteBuf.writeBytes(responseData);
-    channel.writeAndFlush(byteBuf);
+    //使用netty的线程池处理请求
+    ctx.executor().execute(()->{
+      //处理请求
+      try {
+        ResponseBean responseBean = handleRequest(requestBean);
+        byte[] responseData = new byte[0];
+        responseData = responseBean.serialize();
+        NioSocketChannel channel = (NioSocketChannel) ctx.channel();
+        ByteBuf byteBuf = ByteBufAllocator.DEFAULT.directBuffer();
+        byteBuf.writeBytes(responseData);
+        channel.writeAndFlush(byteBuf);
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    });
   }
 
   private ResponseBean handleRequest(RequestBean requestBean){

@@ -51,10 +51,6 @@ public class ProxyFactory {
         //获取一个客户端连接
         NioSocketChannel client = ClientFactory
             .getClientConnection(new InetSocketAddress("192.168.25.1", 9090));
-        ByteBuf byteBuf = ByteBufAllocator.DEFAULT.directBuffer();
-        byteBuf.writeBytes(serialize);
-        ChannelFuture channelFuture = client.writeAndFlush(byteBuf);
-        channelFuture.sync();//等待发送完成
 
         CountDownLatch countDownLatch = new CountDownLatch(1);
         AtomicReference<ResponseBean> responseRef = new AtomicReference<>();
@@ -63,6 +59,12 @@ public class ProxyFactory {
               responseRef.set(responseBean);
               countDownLatch.countDown();
             });
+
+        ByteBuf byteBuf = ByteBufAllocator.DEFAULT.directBuffer();
+        byteBuf.writeBytes(serialize);
+        ChannelFuture channelFuture = client.writeAndFlush(byteBuf);
+        channelFuture.sync();//等待发送完成
+
         countDownLatch.await();//阻塞
         //获取响应
         ResponseBean responseBean = responseRef.get();
