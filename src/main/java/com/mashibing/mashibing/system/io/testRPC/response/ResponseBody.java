@@ -11,7 +11,7 @@ import java.io.Serializable;
  */
 public class ResponseBody implements Serializable {
 
-  public ResponseBody(Object result) {
+  public ResponseBody(Object content) {
     this.content = content;
   }
 

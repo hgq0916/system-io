@@ -67,8 +67,7 @@ public class ProxyFactory {
         //获取响应
         ResponseBean responseBean = responseRef.get();
 
-        if (responseBean == null)
-          return null;
+        if (responseBean == null) return null;
         Object content = responseBean.getResponseBody().getContent();
         return content;
       }

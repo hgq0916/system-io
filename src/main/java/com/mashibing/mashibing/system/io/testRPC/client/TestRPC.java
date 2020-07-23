@@ -15,7 +15,7 @@ public class TestRPC {
     ProxyFactory proxyFactory = new ProxyFactory();
     IHelloService helloService = proxyFactory.getBean(IHelloService.class);
     String sayHello = helloService.sayHello("张三");
-    System.out.println(sayHello);
+    System.out.println("执行结果："+sayHello);
   }
 
 }
