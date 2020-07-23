@@ -1,6 +1,6 @@
 package com.mashibing.mashibing.system.io.testRPC.client;
 
-import com.mashibing.mashibing.system.io.testRPC.client.response.ResponseBean;
+import com.mashibing.mashibing.system.io.testRPC.response.ResponseBean;
 
 /**
  * @author gangquan.hu

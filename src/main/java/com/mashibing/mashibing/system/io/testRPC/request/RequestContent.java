@@ -1,10 +1,11 @@
-package com.mashibing.mashibing.system.io.testRPC.client.request;
+package com.mashibing.mashibing.system.io.testRPC.request;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
 /**
  * @author gangquan.hu
- * @Package: com.mashibing.mashibing.system.io.testRPC.client.request.RequestContent
+ * @Package: com.mashibing.mashibing.system.io.testRPC.request.RequestContent
  * @Description: 请求内容
  * @date 2020/7/23 11:50
  */
@@ -49,4 +50,15 @@ public class RequestContent implements Serializable {
   public void setArgs(Object[] args) {
     this.args = args;
   }
+
+  @Override
+  public String toString() {
+    return "RequestContent{" +
+        "serverName='" + serverName + '\'' +
+        ", methodName='" + methodName + '\'' +
+        ", parameterTypes=" + Arrays.toString(parameterTypes) +
+        ", args=" + Arrays.toString(args) +
+        '}';
+  }
+
 }

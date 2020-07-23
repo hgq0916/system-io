@@ -1,6 +1,6 @@
 package com.mashibing.mashibing.system.io.testRPC.client;
 
-import com.mashibing.mashibing.system.io.testRPC.client.response.ResponseBean;
+import com.mashibing.mashibing.system.io.testRPC.response.ResponseBean;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -22,6 +22,8 @@ public class ClientResponseHandler extends ChannelInboundHandlerAdapter {
 
     //todo 考虑粘包问题
     ResponseBean responseBean = ResponseBean.deserialize(data);
+
+    System.out.println("收到响应："+responseBean);
 
     long requestId = responseBean.getResponseHeader().getRequestId();
     ResponseCallbackPool.exectueCallback(requestId,responseBean);

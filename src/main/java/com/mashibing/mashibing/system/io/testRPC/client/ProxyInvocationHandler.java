@@ -1,8 +1,8 @@
 package com.mashibing.mashibing.system.io.testRPC.client;
 
-import com.mashibing.mashibing.system.io.testRPC.client.request.RequestBean;
-import com.mashibing.mashibing.system.io.testRPC.client.request.RequestContent;
-import com.mashibing.mashibing.system.io.testRPC.client.response.ResponseBean;
+import com.mashibing.mashibing.system.io.testRPC.request.RequestBean;
+import com.mashibing.mashibing.system.io.testRPC.request.RequestContent;
+import com.mashibing.mashibing.system.io.testRPC.response.ResponseBean;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.ChannelFuture;
@@ -24,7 +24,7 @@ public class ProxyInvocationHandler implements InvocationHandler {
   @Override
   public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 
-    String serverName = proxy.getClass().getName();//服务名称
+    String serverName = proxy.getClass().getSuperclass().getName();//服务名称
     String methodName = method.getName();//方法名
     Class<?>[] parameterTypes = method.getParameterTypes();//参数类型
 
@@ -41,7 +41,7 @@ public class ProxyInvocationHandler implements InvocationHandler {
 
     //获取一个客户端连接
     NioSocketChannel client = ClientFactory
-        .getClientConnection(new InetSocketAddress("192.168.68.129", 9090));
+        .getClientConnection(new InetSocketAddress("192.168.68.1", 9090));
     ByteBuf byteBuf = ByteBufAllocator.DEFAULT.directBuffer();
     byteBuf.writeBytes(serialize);
     ChannelFuture channelFuture = client.writeAndFlush(byteBuf);
