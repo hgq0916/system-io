@@ -50,7 +50,7 @@ public class ProxyFactory {
 
         //获取一个客户端连接
         NioSocketChannel client = ClientFactory
-            .getClientConnection(new InetSocketAddress("192.168.68.1", 9090));
+            .getClientConnection(new InetSocketAddress("192.168.25.1", 9090));
         ByteBuf byteBuf = ByteBufAllocator.DEFAULT.directBuffer();
         byteBuf.writeBytes(serialize);
         ChannelFuture channelFuture = client.writeAndFlush(byteBuf);
