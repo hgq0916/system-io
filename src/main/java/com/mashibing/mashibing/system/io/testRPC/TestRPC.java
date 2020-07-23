@@ -18,7 +18,7 @@ public class TestRPC {
     ProxyFactory proxyFactory = new ProxyFactory();
     IHelloService helloService = proxyFactory.getBean(IHelloService.class);
 
-    int size = 20;
+    int size = 100;
     Thread[] threads = new Thread[size];
     AtomicInteger num = new AtomicInteger(1);
     for(int i=0;i<size;i++){

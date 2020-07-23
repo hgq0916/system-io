@@ -16,12 +16,7 @@ public class ClientResponseHandler extends ChannelInboundHandlerAdapter {
   @Override
   public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
 
-    ByteBuf buf = (ByteBuf) msg;
-    byte[] data = new byte[buf.readableBytes()];
-    buf.readBytes(data);
-
-    //todo 考虑粘包问题
-    ResponseBean responseBean = ResponseBean.deserialize(data);
+    ResponseBean responseBean = (ResponseBean) msg;
 
     System.out.println("收到响应："+responseBean);
 
