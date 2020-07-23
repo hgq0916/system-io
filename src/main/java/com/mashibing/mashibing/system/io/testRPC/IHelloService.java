@@ -1,5 +1,7 @@
 package com.mashibing.mashibing.system.io.testRPC;
 
+import com.mashibing.mashibing.system.io.testRPC.bean.User;
+
 /**
  * @author gangquan.hu
  * @Package: com.mashibing.mashibing.system.io.testRPC.IHelloService
@@ -9,5 +11,7 @@ package com.mashibing.mashibing.system.io.testRPC;
 public interface IHelloService {
 
   String sayHello(String name);
+
+  User getUserById(String id);
 
 }
