@@ -24,6 +24,7 @@ public class ResponseCallbackPool {
     ResponseCallback responseCallback = responseCallbackMap.get(requestId);
     if(responseCallback == null) throw new IllegalArgumentException("requestId cannot be found:"+requestId);
     responseCallback.callback(responseBean);
+    responseCallbackMap.remove(requestId);
   }
 
 }
