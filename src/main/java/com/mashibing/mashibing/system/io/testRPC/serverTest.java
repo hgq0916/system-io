@@ -1,4 +1,6 @@
-package com.mashibing.mashibing.system.io.testRPC.server;
+package com.mashibing.mashibing.system.io.testRPC;
+
+import com.mashibing.mashibing.system.io.testRPC.server.Server;
 
 /**
  * @author gangquan.hu

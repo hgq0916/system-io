@@ -25,10 +25,11 @@ public class Server {
           @Override
           protected void initChannel(NioSocketChannel nioSocketChannel) throws Exception {
             ChannelPipeline pipeline = nioSocketChannel.pipeline();
+            pipeline.addLast(new ClientRequestDecoder());//添加客户端数据解码器
             pipeline.addLast(new ClientRequestHandler());
           }
         })
-        .bind("192.168.68.1", 9090);
+        .bind("192.168.25.1", 9090);
     ChannelFuture channelFuture = bind.sync();
     System.out.println("服务端启动...");
     channelFuture.channel().closeFuture().sync();

@@ -13,7 +13,7 @@ import java.util.Arrays;
 public class RequestHeader {
 
   public static final int REQUEST_HEAD_LEN = 20;
-  private static final int DEFAULT_REQUEST_SIGN = 0x14141414;
+  public static final int DEFAULT_REQUEST_SIGN = 0x14141414;
 
   private int sign;//标志位
 

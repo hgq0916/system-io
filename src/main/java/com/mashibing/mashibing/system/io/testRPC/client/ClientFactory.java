@@ -90,6 +90,7 @@ public class ClientFactory {
               @Override
               protected void initChannel(NioSocketChannel nioSocketChannel) throws Exception {
                 ChannelPipeline pipeline = nioSocketChannel.pipeline();
+                pipeline.addLast(new ClientResponseDecoder());
                 pipeline.addLast(new ClientResponseHandler());
               }
             })

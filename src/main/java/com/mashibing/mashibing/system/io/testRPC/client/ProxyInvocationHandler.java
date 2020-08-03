@@ -10,6 +10,7 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -21,10 +22,16 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class ProxyInvocationHandler implements InvocationHandler {
 
+  private Class<?> clazz;
+
+  public ProxyInvocationHandler(Class<?> clazz){
+    this.clazz = clazz;
+  }
+
   @Override
   public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 
-    String serverName = proxy.getClass().getSuperclass().getName();//服务名称
+    String serverName = clazz.getName();//服务名称
     String methodName = method.getName();//方法名
     Class<?>[] parameterTypes = method.getParameterTypes();//参数类型
 
@@ -41,23 +48,41 @@ public class ProxyInvocationHandler implements InvocationHandler {
 
     //获取一个客户端连接
     NioSocketChannel client = ClientFactory
-        .getClientConnection(new InetSocketAddress("192.168.68.1", 9090));
+        .getClientConnection(new InetSocketAddress("192.168.25.1", 9090));
+
+    //方式一
+        /*CountDownLatch countDownLatch = new CountDownLatch(1);
+        AtomicReference<ResponseBean> responseRef = new AtomicReference<>();
+        ResponseCallbackPool
+            .addCallback(requestBean.getRequestHeader().getRequestId(), (responseBean) -> {
+              responseRef.set(responseBean);
+              countDownLatch.countDown();
+            });
+
+        ByteBuf byteBuf = ByteBufAllocator.DEFAULT.directBuffer();
+        byteBuf.writeBytes(serialize);
+        ChannelFuture channelFuture = client.writeAndFlush(byteBuf);
+        channelFuture.sync();//等待发送完成
+
+        countDownLatch.await();//阻塞
+        //获取响应
+        ResponseBean responseBean = responseRef.get();
+
+        if (responseBean == null) return null;
+        Object content = responseBean.getResponseBody().getContent();
+        return content;*/
+
+    //方式二：
+    CompletableFuture completableFuture = new CompletableFuture();
+    ResponseCallbackPool
+        .addCallback(requestBean.getRequestHeader().getRequestId(),completableFuture );
+
     ByteBuf byteBuf = ByteBufAllocator.DEFAULT.directBuffer();
     byteBuf.writeBytes(serialize);
     ChannelFuture channelFuture = client.writeAndFlush(byteBuf);
     channelFuture.sync();//等待发送完成
 
-    CountDownLatch countDownLatch = new CountDownLatch(1);
-    AtomicReference<ResponseBean> responseRef = new AtomicReference<>();
-    ResponseCallbackPool
-        .addCallback(requestBean.getRequestHeader().getRequestId(), (responseBean) -> {
-          countDownLatch.countDown();
-          responseRef.set(responseBean);
-        });
-    countDownLatch.await();//阻塞
-    //获取响应
-    ResponseBean responseBean = responseRef.get();
-
+    ResponseBean responseBean = (ResponseBean) completableFuture.get();//get方法会阻塞
     if (responseBean == null)
       return null;
     Object content = responseBean.getResponseBody().getContent();

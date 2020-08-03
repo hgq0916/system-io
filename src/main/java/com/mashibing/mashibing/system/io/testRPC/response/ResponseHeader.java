@@ -12,7 +12,7 @@ import java.util.Arrays;
 public class ResponseHeader {
 
   public static final int RESPONSE_HEAD_LEN = 20;
-  private static final int DEFAULT_REQUEST_SIGN = 0x14141414;
+  public static final int DEFAULT_REQUEST_SIGN = 0x14141414;
 
   private int sign;//标志位
 
